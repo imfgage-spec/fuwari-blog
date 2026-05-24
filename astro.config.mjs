@@ -34,7 +34,7 @@ export const blogInfo = {
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://fuwari.vercel.app/",
+	site: "https://miniblog-1ahhdpwyo-imfgage-specs-projects.vercel.app/",
 	base: "/",
 	trailingSlash: "always",
 	integrations: [
