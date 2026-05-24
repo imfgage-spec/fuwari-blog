@@ -8,10 +8,10 @@ import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeComponents from "rehype-components"; /* Render the custom directive content */
+import rehypeComponents from "rehype-components";
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
-import remarkDirective from "remark-directive"; /* Handle directives */
+import remarkDirective from "remark-directive";
 import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
@@ -24,6 +24,14 @@ import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-copy-button.js";
 
+// 自定义博客信息
+export const blogInfo = {
+  title: "石猫博客",
+  description: "石猫就是石头猫",
+  avatar: "https://img.cdn1.vip/i/6a1260c5a3ef6_1779589317.webp",
+  subtitle: ""
+};
+
 // https://astro.build/config
 export default defineConfig({
 	site: "https://fuwari.vercel.app/",
@@ -35,9 +43,7 @@ export default defineConfig({
 		}),
 		swup({
 			theme: false,
-			animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
-			// the default value `transition-` cause transition delay
-			// when the Tailwind class `transition-all` is used
+			animationClass: "transition-swup-",
 			containers: ["main", "#toc"],
 			smoothScrolling: true,
 			cache: true,
@@ -49,7 +55,6 @@ export default defineConfig({
 		}),
 		icon({
 			include: {
-				"preprocess: vitePreprocess(),": ["*"],
 				"fa6-brands": ["*"],
 				"fa6-regular": ["*"],
 				"fa6-solid": ["*"],
@@ -88,85 +93,30 @@ export default defineConfig({
 					editorActiveTabIndicatorTopColor: "none",
 					editorTabBarBorderBottomColor: "var(--codeblock-topbar-bg)",
 					terminalTitlebarBorderBottomColor: "none"
-				},
-				textMarkers: {
-					delHue: 0,
-					insHue: 180,
-					markHue: 250
 				}
-			},
-			frames: {
-				showCopyToClipboardButton: false,
 			}
-		}),
-        svelte(),
-		sitemap(),
+		})
 	],
 	markdown: {
 		remarkPlugins: [
 			remarkMath,
-			remarkReadingTime,
-			remarkExcerpt,
+			remarkSectionize,
 			remarkGithubAdmonitionsToDirectives,
 			remarkDirective,
-			remarkSectionize,
 			parseDirectiveNode,
+			remarkReadingTime,
+			remarkExcerpt
 		],
 		rehypePlugins: [
-			rehypeKatex,
 			rehypeSlug,
-			[
-				rehypeComponents,
-				{
-					components: {
-						github: GithubCardComponent,
-						note: (x, y) => AdmonitionComponent(x, y, "note"),
-						tip: (x, y) => AdmonitionComponent(x, y, "tip"),
-						important: (x, y) => AdmonitionComponent(x, y, "important"),
-						caution: (x, y) => AdmonitionComponent(x, y, "caution"),
-						warning: (x, y) => AdmonitionComponent(x, y, "warning"),
-					},
-				},
-			],
-			[
-				rehypeAutolinkHeadings,
-				{
-					behavior: "append",
-					properties: {
-						className: ["anchor"],
-					},
-					content: {
-						type: "element",
-						tagName: "span",
-						properties: {
-							className: ["anchor-icon"],
-							"data-pagefind-ignore": true,
-						},
-						children: [
-							{
-								type: "text",
-								value: "#",
-							},
-						],
-					},
-				},
-			],
-		],
-	},
-	vite: {
-		build: {
-			rollupOptions: {
-				onwarn(warning, warn) {
-					// temporarily suppress this warning
-					if (
-						warning.message.includes("is dynamically imported by") &&
-						warning.message.includes("but also statically imported by")
-					) {
-						return;
-					}
-					warn(warning);
-				},
-			},
-		},
-	},
+			rehypeAutolinkHeadings,
+			rehypeKatex,
+			[rehypeComponents, {
+				components: {
+					admonition: AdmonitionComponent,
+					githubCard: GithubCardComponent
+				}
+			}]
+		]
+	}
 });
