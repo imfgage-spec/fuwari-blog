@@ -8,10 +8,10 @@ import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeComponents from "rehype-components";
+import rehypeComponents from "rehype-components"; /* Render the custom directive content */
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
-import remarkDirective from "remark-directive";
+import remarkDirective from "remark-directive"; /* Handle directives */
 import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
@@ -24,14 +24,6 @@ import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-copy-button.js";
 
-// 自定义博客信息
-export const blogInfo = {
-  title: "石猫博客",
-  description: "石猫就是石头猫",
-  avatar: "https://img.cdn1.vip/i/6a1260c5a3ef6_1779589317.webp",
-  subtitle: ""
-};
-
 // https://astro.build/config
 export default defineConfig({
 	site: "https://miniblog-1ahhdpwyo-imfgage-specs-projects.vercel.app/",
@@ -43,7 +35,9 @@ export default defineConfig({
 		}),
 		swup({
 			theme: false,
-			animationClass: "transition-swup-",
+			animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
+			// the default value `transition-` cause transition delay
+			// when the Tailwind class `transition-all` is used
 			containers: ["main", "#toc"],
 			smoothScrolling: true,
 			cache: true,
@@ -55,6 +49,7 @@ export default defineConfig({
 		}),
 		icon({
 			include: {
+				"preprocess: vitePreprocess(),": ["*"],
 				"fa6-brands": ["*"],
 				"fa6-regular": ["*"],
 				"fa6-solid": ["*"],
@@ -93,30 +88,3 @@ export default defineConfig({
 					editorActiveTabIndicatorTopColor: "none",
 					editorTabBarBorderBottomColor: "var(--codeblock-topbar-bg)",
 					terminalTitlebarBorderBottomColor: "none"
-				}
-			}
-		})
-	],
-	markdown: {
-		remarkPlugins: [
-			remarkMath,
-			remarkSectionize,
-			remarkGithubAdmonitionsToDirectives,
-			remarkDirective,
-			parseDirectiveNode,
-			remarkReadingTime,
-			remarkExcerpt
-		],
-		rehypePlugins: [
-			rehypeSlug,
-			rehypeAutolinkHeadings,
-			rehypeKatex,
-			[rehypeComponents, {
-				components: {
-					admonition: AdmonitionComponent,
-					githubCard: GithubCardComponent
-				}
-			}]
-		]
-	}
-});
